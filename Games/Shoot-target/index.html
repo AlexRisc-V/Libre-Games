@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shoot Target</title>
+    <style>
+        :root { --accent: #00f2ff; --bg: #0f172a; --error: #ef4444; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+
+        .ui-top { display: flex; gap: 50px; margin-bottom: 20px; }
+        .stat { font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
+        .stat span { color: white; font-size: 1.5rem; display: block; }
+
+        #campo { width: 90%; max-width: 1000px; height: 300px; background: #1e293b; position: relative; border-radius: 16px; border: 2px solid #334155; overflow: hidden; }
+        
+        #diana { width: 60px; height: 60px; background: white; border-radius: 50%; position: absolute; top: 120px; box-shadow: 0 0 20px var(--accent); border: 10px solid var(--error); }
+        
+        #mira { position: absolute; top: 0; left: 50%; bottom: 0; width: 4px; background: rgba(255,255,255,0.1); transform: translateX(-50%); pointer-events: none; }
+        #mira::after { content: ''; position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; border: 4px solid var(--accent); border-radius: 50%; transform: translate(-50%, -50%); }
+
+        #overlay { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+        .hidden { display: none !important; }
+        button { background: var(--accent); border: none; padding: 15px 30px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="ui-top">
+        <div class="stat">SCORE <span id="score">0</span></div>
+        <div class="stat">BEST <span id="maxScore">0</span></div>
+    </div>
+
+    <div id="campo">
+        <div id="mira"></div>
+        <div id="diana"></div>
+        <div id="overlay">
+            <h1 id="msg">SHOOT TARGET</h1>
+            <button onclick="iniciarJuego()">PRESIONA PARA JUGAR</button>
+        </div>
+    </div>
+
+    <script>
+        const diana = document.getElementById('diana'), scoreEl = document.getElementById('score'), maxEl = document.getElementById('maxScore'), overlay = document.getElementById('overlay'), msg = document.getElementById('msg'), campo = document.getElementById('campo');
+        let score = 0, vel = 4, pos = -100, jugando = false, max = localStorage.getItem('sTargetMax') || 0;
+        maxEl.innerText = max;
+
+        function iniciarJuego() { score = 0; vel = 4; pos = -100; scoreEl.innerText = 0; overlay.classList.add('hidden'); jugando = true; }
+
+        function gameOver() {
+            jugando = false; overlay.classList.remove('hidden');
+            msg.innerText = "¡FALLASTE! SCORE: " + score;
+        }
+
+        function mover() {
+            if(jugando) {
+                pos += vel;
+                if (pos > campo.offsetWidth) pos = -100; // La diana vuelve a empezar en vez de terminar el juego
+                diana.style.left = pos + 'px';
+            }
+            requestAnimationFrame(mover);
+        }
+
+        function disparar() {
+            if(!jugando) return;
+            const centro = campo.offsetWidth / 2;
+            const posDiana = pos + 30; // Centro de la diana
+
+            if (Math.abs(posDiana - centro) < 45) { // Aumenté un poco el margen de éxito (45px)
+                score++; 
+                vel += 0.2; // Aumento suave
+                scoreEl.innerText = score;
+                if (score > max) { max = score; localStorage.setItem('sTargetMax', max); maxEl.innerText = max; }
+            } else { 
+                gameOver(); 
+            }
+        }
+
+        document.addEventListener('keydown', (e) => { if(e.code === 'Space') disparar(); });
+        document.addEventListener('mousedown', disparar);
+        
+        function checkGamepad() {
+            const gp = navigator.getGamepads()[0];
+            if (gp && (gp.buttons[0].pressed || gp.buttons[1].pressed) && !window.p) { disparar(); window.p = true; } 
+            else if (gp && !gp.buttons[0].pressed && !gp.buttons[1].pressed) window.p = false;
+            requestAnimationFrame(checkGamepad);
+        }
+
+        mover(); checkGamepad();
+    </script>
+</body>
+</html>
