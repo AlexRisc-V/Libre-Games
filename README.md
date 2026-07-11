@@ -1,1 +1,1 @@
-# OpenGames
+# Libre Games
