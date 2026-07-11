@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libre Games</title>
+    <style>
+        body { margin: 0; background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; }
+        
+        header { padding: 40px; text-align: center; }
+        h1 { font-size: 2.5rem; margin: 0; color: #00f2ff; text-transform: uppercase; letter-spacing: 2px; }
+
+        .slider-container { 
+            display: flex; overflow-x: auto; gap: 20px; padding: 50px 20px; 
+            scroll-snap-type: x mandatory; align-items: center; 
+        }
+
+        .game-card { 
+            min-width: 300px; background: #1e293b; padding: 30px; 
+            border-radius: 20px; scroll-snap-align: center; 
+            text-align: center; border: 1px solid #334155;
+        }
+
+        .game-card h2 { margin: 0 0 20px 0; }
+
+        .action-btn { 
+            background: #00f2ff; border: none; padding: 15px 30px; 
+            border-radius: 10px; cursor: pointer; font-weight: bold; 
+            font-size: 1rem; color: #0f172a; transition: transform 0.2s;
+        }
+
+        .action-btn:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Libre Games</h1>
+    </header>
+
+    <div class="slider-container" id="game-slider"></div>
+
+    <script>
+        async function cargarTienda() {
+            try {
+                // Buscamos el archivo en minúsculas como pediste
+                const respuesta = await fetch('games.json');
+                const juegos = await respuesta.json();
+                const slider = document.getElementById('game-slider');
+
+                juegos.forEach(juego => {
+                    const card = document.createElement('div');
+                    card.className = 'game-card';
+                    card.innerHTML = `
+                        <h2>${juego.titulo}</h2>
+                        <button class="action-btn" onclick="window.location.href='${juego.ruta}'">
+                            JUGAR
+                        </button>
+                    `;
+                    slider.appendChild(card);
+                });
+            } catch (error) {
+                console.error("No se pudo cargar la librería:", error);
+            }
+        }
+
+        cargarTienda();
+    </script>
+</body>
+</html>
