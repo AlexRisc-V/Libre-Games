@@ -1,0 +1,9 @@
+{
+  "name": "Libre Games",
+  "short_name": "LibreGames",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "background_color": "#0b0e14",
+  "theme_color": "#00f2ff",
+  "icons": []
+}
