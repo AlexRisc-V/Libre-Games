@@ -5,50 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Libre Games | Console</title>
     <style>
-        :root { --bg: #0b0e14; --card: #1c222d; --accent: #00f2ff; }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; }
-        
-        header { padding: 40px 20px; border-bottom: 2px solid #2d3748; background: #0f172a; }
-        h1 { margin: 0; font-size: 2rem; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; }
-
-        /* Contenedor Responsivo: PC = Grid, Móvil = Flex Slider */
-        .console-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 30px; 
-            padding: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            box-sizing: border-box;
+        :root { --bg: #0b0e14; --card: #1a1f29; --accent: #00f2ff; }
+        body { 
+            margin: 0; background: var(--bg); color: white; 
+            font-family: 'Segoe UI', system-ui, sans-serif; height: 100vh;
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
+        header { padding: 40px; }
+        h1 { margin: 0; color: white; text-transform: uppercase; letter-spacing: 4px; border-left: 5px solid var(--accent); padding-left: 15px; }
+
+        /* Contenedor del Slider (Consola) */
+        .slider-container { 
+            flex-grow: 1; display: flex; align-items: center; 
+            overflow-x: auto; padding: 0 50px; gap: 40px;
+            scroll-snap-type: x mandatory; scroll-behavior: smooth;
+        }
+
+        /* Tarjeta tipo "Box Art" de consola */
         .game-card { 
-            background: var(--card); 
-            border-radius: 16px; 
-            padding: 20px; 
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-align: center;
+            min-width: 280px; height: 350px; background: var(--card);
+            border-radius: 12px; display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 20px;
+            scroll-snap-align: center; border: 2px solid transparent;
+            transition: all 0.3s ease; position: relative;
         }
 
-        .game-card:hover { border-color: var(--accent); transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .game-card:hover, .game-card:focus { 
+            border-color: var(--accent); transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+        }
 
-        .game-card h2 { margin: 0 0 15px 0; color: white; }
+        .game-card h2 { margin: 0 0 10px 0; font-size: 1.5rem; }
 
         .action-btn { 
-            background: transparent; border: 2px solid var(--accent); 
-            color: var(--accent); padding: 10px 20px; border-radius: 8px; 
-            font-weight: bold; cursor: pointer; transition: 0.3s;
+            background: white; border: none; padding: 12px; 
+            border-radius: 6px; font-weight: bold; cursor: pointer;
+            text-transform: uppercase; transition: background 0.2s;
         }
 
-        .game-card:hover .action-btn { background: var(--accent); color: var(--bg); }
+        .action-btn:hover { background: var(--accent); }
 
-        /* Ajuste móvil */
+        /* Ajuste responsivo */
         @media (max-width: 600px) {
-            .console-grid { grid-template-columns: 1fr; padding: 20px; }
-            h1 { font-size: 1.5rem; text-align: center; }
+            h1 { font-size: 1.5rem; }
+            .game-card { min-width: 220px; height: 300px; }
         }
     </style>
 </head>
@@ -58,29 +59,25 @@
         <h1>Libre Games</h1>
     </header>
 
-    <main class="console-grid" id="game-slider"></main>
+    <div class="slider-container" id="game-slider"></div>
 
     <script>
         async function cargarTienda() {
-            try {
-                const respuesta = await fetch('games.json');
-                const juegos = await respuesta.json();
-                const container = document.getElementById('game-slider');
+            const resp = await fetch('games.json');
+            const juegos = await resp.json();
+            const slider = document.getElementById('game-slider');
 
-                juegos.forEach(juego => {
-                    const card = document.createElement('div');
-                    card.className = 'game-card';
-                    card.innerHTML = `
-                        <h2>${juego.titulo}</h2>
-                        <button class="action-btn" onclick="window.location.href='${juego.ruta}'">
-                            PLAY
-                        </button>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (err) {
-                console.error("Error al cargar juegos:", err);
-            }
+            juegos.forEach(juego => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `
+                    <h2>${juego.titulo}</h2>
+                    <button class="action-btn" onclick="window.location.href='${juego.ruta}'">
+                        JUGAR
+                    </button>
+                `;
+                slider.appendChild(card);
+            });
         }
         cargarTienda();
     </script>
