@@ -2,6 +2,6 @@
   {
     "id": "shoot-target",
     "titulo": "Shoot Target",
-    "ruta": "Games/Shoot-target/index.html"
+    "ruta": "games/shoot-target/index.html"
   }
 ]
